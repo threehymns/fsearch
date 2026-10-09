@@ -23,11 +23,36 @@ fn paths(live: &Live, hits: &[fsearch::query::Hit]) -> Vec<String> {
         .collect()
 }
 
+/// Fixture home from real directories. Removal runs on drop, so a
+/// failing assert never leaves the tree behind in tmpfs.
+struct Fixture(std::path::PathBuf);
+
+impl Fixture {
+    fn create() -> Self {
+        let p = std::path::PathBuf::from("/tmp/fsearch-graft-synth");
+        let _ = std::fs::remove_dir_all(&p);
+        std::fs::create_dir_all(p.join("h1/proj")).unwrap();
+        std::fs::write(p.join("h1/proj/main.rs"), b"hello").unwrap();
+        Fixture(p)
+    }
+
+    fn home(&self) -> &[u8] {
+        b"/tmp/fsearch-graft-synth/h1"
+    }
+}
+
+impl Drop for Fixture {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_dir_all(&self.0);
+    }
+}
+
 #[test]
 fn graft_prefix_is_no_hit_no_scope() {
-    let home = b"/tmp/fsearch-graft-synth/h1";
-    std::fs::create_dir_all("/tmp/fsearch-graft-synth/h1/proj").unwrap();
-    std::fs::write("/tmp/fsearch-graft-synth/h1/proj/main.rs", b"hello").unwrap();
+    let fx = Fixture::create();
+    let home = fx.home();
+    let live = live_at(home);
+    let s = Searcher { live: &live };
     let hs = "/tmp/fsearch-graft-synth/h1";
     let live = live_at(home);
     let s = Searcher { live: &live };
@@ -43,5 +68,4 @@ fn graft_prefix_is_no_hit_no_scope() {
     assert!(s.search(&Query::parse("in:/tmp main", hs).unwrap()).is_empty());
     let scoped = paths(&live, &s.search(&Query::parse("in:/tmp/fsearch-graft-synth/h1 main", hs).unwrap()));
     assert!(!scoped.is_empty(), "in:HOME broke: {scoped:?}");
-    std::fs::remove_dir_all("/tmp/fsearch-graft-synth").ok();
 }
