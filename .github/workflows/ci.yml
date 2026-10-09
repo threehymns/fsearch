@@ -1,0 +1,24 @@
+name: ci
+on:
+  push:
+    branches: [main, linux-port]
+  pull_request:
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo fmt --check
+      - run: cargo check --all-targets
+      - run: cargo test
+      - run: cargo clippy --all-targets -- -D warnings
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo fmt --check
+      - run: cargo check --all-targets
+      - run: cargo test
+      - run: cargo clippy --all-targets -- -D warnings
