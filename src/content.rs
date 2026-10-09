@@ -210,8 +210,8 @@ impl Segment {
         }
         let mut dead = vec![0u64; ndocs.div_ceil(64)];
         if let Ok(b) = std::fs::read(dead_path(dir, id)) {
-            for (w, c) in dead.iter_mut().zip(b.chunks_exact(8)) {
-                *w = u64::from_le_bytes(c.try_into().unwrap());
+            for (w, c) in dead.iter_mut().zip(b.as_chunks::<8>().0) {
+                *w = u64::from_le_bytes(*c);
             }
         }
         let live_docs = ndocs - dead.iter().map(|w| w.count_ones() as usize).sum::<usize>();
