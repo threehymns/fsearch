@@ -51,8 +51,6 @@ impl Drop for Fixture {
 fn graft_prefix_is_no_hit_no_scope() {
     let fx = Fixture::create();
     let home = fx.home();
-    let live = live_at(home);
-    let s = Searcher { live: &live };
     let hs = "/tmp/fsearch-graft-synth/h1";
     let live = live_at(home);
     let s = Searcher { live: &live };
