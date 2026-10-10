@@ -1,8 +1,8 @@
-# FSearch
+# FSearch Crossplatform
 
-Whole-disk file search for macOS. Finds any file by name in about a
-millisecond, forgives typos, and searches inside files with an index. Use it
-as a CLI (with a small daemon) or as a Rust crate.
+A cross-platform fork of FSearch, whole-disk file search for macOS. Finds
+any file by name in about a millisecond, forgives typos, and searches inside
+files with an index. Use it as a CLI (with a small daemon) or as a Rust crate.
 
 ```
 cargo build --release && ./target/release/fsearch install   # -> ~/.local/bin/fsearch
@@ -61,13 +61,36 @@ login item (`fsearch install --login`), give `~/.local/bin/fsearch` its own
 grant in System Settings > Privacy & Security, again after each rebuild.
 Without access it skips the protected folders instead of popping a prompt.
 
+## Goals of this Fork
+
+- No change in behavior or logic on macOS compared to upstream.
+- Support Linux and other platforms with parity to upstream where possible.
+- Drop-in support as a dep for apps already using upstream with the same
+binary-name (`fsearch`) as upstream.
+- Staying up to date with the direction taken upstream.
+
+## Non-Goals
+
+- Adding GUI, TUI, or other features not present upstream beyond what's
+needed for cross-platform parity.
+- Bugfixes in platform-shared code before upstream gets them.
+
 ## Linux
 
 Indexes `$HOME` with `getdents64` and watches it with inotify. State lives in
 `$XDG_DATA_HOME/fsearch`, else `~/.local/share/fsearch`. `fsearch install
 --login` installs a systemd user unit. There is no event replay. Restarts
-recover with a `synced_at` mtime relist. Very large trees can exceed
-inotify `max_user_watches`. In that case raise it and restart the daemon.
+recover with a `synced_at` mtime relist.
+
+### Limits
+
+Each watched directory costs one inotify watch, so very large trees
+can exceed `max_user_watches` (a developer home here needs ~465k against
+Arch's 524k default; lower-default systems will hit the wall, so to fix you
+can raise that and restart the daemon). Bursts of files in brand-new directories
+can outrun watch establishment and surface on the next change or restart.
+Cross-device mounts under home (like a flash drive mounted to the path `~/external`)
+are skipped by the scan.
 
 ## API
 
