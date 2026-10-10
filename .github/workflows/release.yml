@@ -35,7 +35,7 @@ jobs:
             artifact: fsearch-x86_64-apple-darwin
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
@@ -76,7 +76,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
@@ -110,7 +110,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
       - name: Publish to crates.io (Dry Run)
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
