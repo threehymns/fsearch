@@ -3,6 +3,13 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (validate builds & packaging, skip publishing)'
+        required: true
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -78,6 +85,7 @@ jobs:
         working-directory: dist
         run: sha256sum * > SHA256SUMS.txt
       - name: Create GitHub Release
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
         working-directory: dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -86,6 +94,16 @@ jobs:
             --title "${{ github.ref_name }}" \
             --generate-notes \
             *
+      - name: Dry Run Summary
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        working-directory: dist
+        run: |
+          echo "=== DRY RUN SUCCESSFUL ==="
+          echo "Verified release artifacts:"
+          ls -lh
+          echo ""
+          echo "SHA256 checksums:"
+          cat SHA256SUMS.txt
 
   publish-crates-io:
     needs: test
@@ -93,5 +111,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - name: Publish to crates.io (Dry Run)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        run: cargo publish --dry-run
       - name: Publish to crates.io
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
         run: cargo publish --token ${{ secrets.CRATES_IO_TOKEN }}
