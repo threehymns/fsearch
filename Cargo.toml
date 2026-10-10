@@ -23,7 +23,7 @@ files with an index.\
 section = "utils"
 priority = "optional"
 assets = [
-    ["target/x86_64-unknown-linux-gnu/release/fsearch", "usr/bin/fsearch", "755"],
+    ["target/release/fsearch", "usr/bin/fsearch", "755"],
     ["README.md", "usr/share/doc/fsearch-crossplatform/README.md", "644"],
 ]
 conflicts = "fsearch"
