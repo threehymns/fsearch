@@ -1,11 +1,17 @@
 # FSearch Crossplatform
 
-A cross-platform fork of FSearch, whole-disk file search for macOS. Finds
+A cross-platform fork of [FSearch](https://github.com/noahdunnagan/fsearch), whole-disk file search for macOS and Linux. Finds
 any file by name in about a millisecond, forgives typos, and searches inside
 files with an index. Use it as a CLI (with a small daemon) or as a Rust crate.
 
-```
+```bash
+# Install the CLI
+cargo install fsearch-crossplatform
+
+# Or build from source
 cargo build --release && ./target/release/fsearch install   # -> ~/.local/bin/fsearch
+
+# Use
 fsearch fsearch main              # find files by name
 fsearch 'ext:rs grep:apply_dir'   # search inside files
 ```
@@ -101,7 +107,14 @@ JSON lines over `fsearch.sock` in the data dir, or `fsearch stdio`:
 {"op": "grep", "pattern": "apply_dir", "in": "~/Developer"}
 ```
 
-Or link the crate:
+Or link the crate in `Cargo.toml`:
+
+```toml
+[dependencies]
+fsearch = { version = "0.1", package = "fsearch-crossplatform" }
+```
+
+And use it in your code:
 
 ```rust
 let engine = fsearch::Engine::start(fsearch::Options { dir: fsearch::default_dir(&home), home: home.clone(), skip: None })?;

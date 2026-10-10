@@ -1,8 +1,21 @@
 [package]
-name = "fsearch"
+name = "fsearch-crossplatform"
 version = "0.1.0"
 edition = "2024"
 license = "MIT"
+description = "A cross-platform fork of fsearch, whole-disk/home file search for macOS and Linux"
+repository = "https://github.com/threehymns/fsearch-crossplatform"
+readme = "README.md"
+keywords = ["search", "fuzzy", "filesystem", "cross-platform", "fast"]
+categories = ["command-line-utilities", "filesystem"]
+
+[lib]
+name = "fsearch"
+path = "src/lib.rs"
+
+[[bin]]
+name = "fsearch"
+path = "src/main.rs"
 
 [dependencies]
 libc = "0.2"
