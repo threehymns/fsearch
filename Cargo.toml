@@ -8,6 +8,7 @@ repository = "https://github.com/threehymns/fsearch-crossplatform"
 readme = "README.md"
 keywords = ["search", "fuzzy", "filesystem", "cross-platform", "fast"]
 categories = ["command-line-utilities", "filesystem"]
+exclude = ["demo", ".github", "rustfmt.toml"]
 
 [lib]
 name = "fsearch"
