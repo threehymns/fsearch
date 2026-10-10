@@ -41,11 +41,26 @@ jobs:
           cp "target/${{ matrix.target }}/release/fsearch" "$staging/"
           cp README.md LICENSE "$staging/"
           tar -czf "${staging}.tar.gz" -C "$staging" .
-      - name: Upload artifact
+      - name: Upload archive artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
           path: ${{ matrix.artifact }}.tar.gz
+
+      - name: Install cargo-deb
+        if: matrix.os == 'ubuntu-latest'
+        uses: taiki-e/install-action@cargo-deb
+      - name: Build Debian package (.deb)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          cargo deb --no-build --target ${{ matrix.target }}
+          cp target/${{ matrix.target }}/debian/*.deb .
+      - name: Upload deb artifact
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: fsearch-deb
+          path: "*.deb"
 
   github-release:
     needs: [test, build-binaries]
@@ -61,7 +76,7 @@ jobs:
           merge-multiple: true
       - name: Generate SHA256 checksums
         working-directory: dist
-        run: sha256sum *.tar.gz > SHA256SUMS.txt
+        run: sha256sum * > SHA256SUMS.txt
       - name: Create GitHub Release
         working-directory: dist
         env:
@@ -70,7 +85,7 @@ jobs:
           gh release create "${{ github.ref_name }}" \
             --title "${{ github.ref_name }}" \
             --generate-notes \
-            *.tar.gz SHA256SUMS.txt
+            *
 
   publish-crates-io:
     needs: test

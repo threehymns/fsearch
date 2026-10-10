@@ -5,8 +5,16 @@ any file by name in about a millisecond, forgives typos, and searches inside
 files with an index. Use it as a CLI (with a small daemon) or as a Rust crate.
 
 ```bash
-# Install the CLI
+# Install via Cargo
 cargo install fsearch-crossplatform
+# or instant precompiled binary via cargo-binstall:
+cargo binstall fsearch-crossplatform
+
+# Arch Linux
+cd packaging && makepkg -si
+
+# Debian / Ubuntu (.deb from GitHub Releases)
+sudo dpkg -i fsearch-crossplatform_*.deb
 
 # Or build from source
 cargo build --release && ./target/release/fsearch install   # -> ~/.local/bin/fsearch

@@ -8,7 +8,26 @@ repository = "https://github.com/threehymns/fsearch-crossplatform"
 readme = "README.md"
 keywords = ["search", "fuzzy", "filesystem", "cross-platform", "fast"]
 categories = ["command-line-utilities", "filesystem"]
-exclude = ["demo", ".github", "rustfmt.toml"]
+exclude = ["demo", ".github", "rustfmt.toml", "packaging"]
+
+[package.metadata.deb]
+name = "fsearch-crossplatform"
+maintainer = "threehymns <70611435+threehymns@users.noreply.github.com>"
+copyright = "2026 threehymns, Noah Dunnagan"
+license-file = ["LICENSE", "4"]
+extended-description = """\
+A cross-platform fork of fsearch, whole-disk/home file search for macOS and Linux. \
+Finds any file by name in about a millisecond, forgives typos, and searches inside \
+files with an index.\
+"""
+section = "utils"
+priority = "optional"
+assets = [
+    ["target/x86_64-unknown-linux-gnu/release/fsearch", "usr/bin/fsearch", "755"],
+    ["README.md", "usr/share/doc/fsearch-crossplatform/README.md", "644"],
+]
+conflicts = "fsearch"
+provides = "fsearch"
 
 [lib]
 name = "fsearch"

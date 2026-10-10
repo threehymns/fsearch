@@ -1,0 +1,41 @@
+# Maintainer: threehymns <https://github.com/threehymns>
+
+pkgname=fsearch-crossplatform
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="A cross-platform fork of fsearch, whole-disk/home file search for macOS and Linux"
+arch=('x86_64')
+url="https://github.com/threehymns/fsearch-crossplatform"
+license=('MIT')
+depends=('gcc-libs')
+makedepends=('cargo')
+provides=('fsearch')
+conflicts=('fsearch')
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+prepare() {
+  cd "$pkgname-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+  cd "$pkgname-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  export CARGO_TARGET_DIR=target
+  cargo build --frozen --release
+}
+
+check() {
+  cd "$pkgname-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  cargo test --frozen
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  install -Dm755 "target/release/fsearch" "$pkgdir/usr/bin/fsearch"
+  install -Dm644 "LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 "README.md" "$pkgdir/usr/share/doc/$pkgname/README.md"
+}
